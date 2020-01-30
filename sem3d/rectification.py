@@ -3,7 +3,7 @@ from .geometry import get_rotation_angles, rotate_img, rotate_point
 from .ransac_skim import filter_outliers
 from .kp import match_keypoints
 
-def translation_alignment(img1, img2, q1, q2, x_margin=5):
+def translation_alignment(img1, img2, q1, q2, x_margin=2):
     """
     """
     # X axis shifting
@@ -82,7 +82,7 @@ def rectify_pair(img1, img2, feat="sift",
                  coef_threshold=.7,
                  dist_threshold=100,
                  min_samples=5,
-                 x_margin=10):
+                 x_margin=2):
     """
     """
     q1, q2 = get_filtered_kp(img1, img2, feat=feat, 
