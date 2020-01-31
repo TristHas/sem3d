@@ -16,6 +16,9 @@ def fundamental_matrix(A,B):
 def rad_to_deg(x):
     return x*180 / np.pi
 
+def deg_to_rad(x):
+    return x*np.pi / 180
+
 def coef_to_angle(a,b):
     """
     """
@@ -26,24 +29,29 @@ def get_rotation_angles(q1, q2):
         returns t1,t2 in degrees
     """
     a,b,c,d,e = fundamental_matrix(q1, q2)
-    return coef_to_angle(c, d), coef_to_angle(a, b) 
+    t1 = coef_to_angle(a, b) 
+    t2 = coef_to_angle(c, d)
+    return t1, t2
 
 def rotation_mat(t):
     """
+        Get rotation matrix corresponding to counter-clockwise rotation t
     """
-    t = t*np.pi / 180
+    t = deg_to_rad(t)
     return np.array([[np.cos(t), -np.sin(t)],
                      [np.sin(t), np.cos(t)]]).T
     
 def rotate_img(img, t):
     """
+        Rotate points by a counter-clockwise rotation t
     """
     print(f"Rotating image by {t}")
     return rotate(img, t, resize=False,
                   preserve_range=True).astype('uint8')
 
-def rotate_point(q, t, center, center_):
+def rotate_point(q, t, center=0, center_=0):
     """
+        Rotate points by a counter-clockwise rotation t
     """
     print(f"Rotating points by {t}")
     q = q-center
