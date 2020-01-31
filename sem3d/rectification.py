@@ -12,22 +12,26 @@ def translation_alignment(img1, img2, q1, q2, x_margin=2):
     q1 -= np.array([[x_shift, y_shift]])
     return img1, img2, q1, q2
 
+def coord_imcenter(im):
+    """
+    """
+    return np.array(im.shape)[::-1][None,:] // 2
+
+def rotate_point_img(im, pts, angle):
+    """
+    """
+    center_pre_rot = coord_imcenter(im)
+    im = rotate_img(im, angle)
+    center_post_rot = coord_imcenter(im)
+    pts = rotate_point(pts, angle, center_pre_rot, center_post_rot)
+    return im, pts
+
 def rotation_alignment(img1, img2, q1, q2):
     """
     """
     t1, t2 = get_rotation_angles(q1, q2)
-    center1 = np.array(img1.shape)[::-1][None,:] // 2
-    center2 = np.array(img2.shape)[::-1][None,:] // 2
-    
-    img1 = rotate_img(img1, t1)
-    img2 = rotate_img(img2, t2)
-    
-    center1_ = np.array(img1.shape)[::-1][None,:] // 2
-    center2_ = np.array(img2.shape)[::-1][None,:] // 2
-
-    q1   = rotate_point(q1, t2, center1, center1_)
-    q2   = rotate_point(q2, t1, center2, center2_)
-
+    img1, q1 = rotate_point_img(img1, q1, t1)
+    img2, q2 = rotate_point_img(img2, q2, t2)
     return img1, img2, q1, q2
 
 def _rectify(img1, img2, q1, q2, x_margin=5):
