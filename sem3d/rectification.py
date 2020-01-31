@@ -1,36 +1,16 @@
 import numpy as np
+from scipy.ndimage.interpolation import shift
+
 from .geometry import get_rotation_angles, rotate_img, rotate_point
 from .ransac_skim import filter_outliers
 from .kp import match_keypoints
 
 def translation_alignment(img1, img2, q1, q2, x_margin=2):
-    """
-    """
-    # X axis shifting
-    x_shift = (q1 - q2).min(0).astype("int")[0]
-    x_shift += x_margin * np.sign(x_shift)
-    if x_shift > 0:
-        img1 = img1[:,x_shift:]
-        img2 = img2[:,:-x_shift]
-        q1[:,0]-=x_shift
-    elif x_shift < 0:
-        img1 = img1[:,:x_shift]
-        img2 = img2[:,-x_shift:]
-        q2[:,0]+=x_shift
-        
-    y_shift = (q1 - q2).mean(0).astype("int")[1]
-    
-    # Y axis shifting
-    if y_shift > 0:
-        img1 = img1[y_shift:]
-        img2 = img2[:-y_shift]
-        q1[:,1]-=y_shift
-    elif y_shift < 0:
-        img1 = img1[:y_shift]
-        img2 = img2[-y_shift:]
-        q2[:,1]+=y_shift
-    
-    return img1, img2, q1, q2, x_shift, y_shift
+    x_shift = (q1 - q2).max(0)[0] + x_margin
+    y_shift = (q1 - q2).mean(0)[1]
+    img1 = shift(img1, (-y_shift, -x_shift))
+    q1 -= np.array([[x_shift, y_shift]])
+    return img1, img2, q1, q2
 
 def rotation_alignment(img1, img2, q1, q2):
     """
@@ -54,8 +34,8 @@ def _rectify(img1, img2, q1, q2, x_margin=5):
     """
     """
     img1, img2, q1, q2 = rotation_alignment(img1, img2, q1, q2)
-    img1, img2, q1, q2,_,_ = translation_alignment(img1, img2, q1, q2, 
-                                                   x_margin=x_margin)
+    img1, img2, q1, q2 = translation_alignment(img1, img2, q1, q2, 
+                                               x_margin=x_margin)
     return img1, img2, q1, q2
 
 def get_filtered_kp(img1, img2, feat="sift", 
