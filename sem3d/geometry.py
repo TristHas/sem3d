@@ -13,6 +13,11 @@ def fundamental_matrix(A,B):
     e = -mean.dot(params) 
     return a, b, c, d, e
 
+def coord_imcenter(im):
+    """
+    """
+    return np.array(im.shape)[::-1][None,:] // 2
+
 def rad_to_deg(x):
     return x*180 / np.pi
 
@@ -45,7 +50,7 @@ def rotate_img(img, t):
     """
         Rotate points by a counter-clockwise rotation t
     """
-    print(f"Rotating image by {t}")
+    #print(f"Rotating image by {t}")
     return rotate(img, t, resize=False,
                   preserve_range=True).astype('uint8')
 
@@ -53,12 +58,20 @@ def rotate_point(q, t, center=0, center_=0):
     """
         Rotate points by a counter-clockwise rotation t
     """
-    print(f"Rotating points by {t}")
+    #print(f"Rotating points by {t}")
     q = q-center
     q = (rotation_mat(t) @ q.T).T
     q = center_ + q
     return q
 
+def rotate_point_img(im, pts, angle):
+    """
+    """
+    center_pre_rot = coord_imcenter(im)
+    im = rotate_img(im, angle)
+    center_post_rot = coord_imcenter(im)
+    pts = rotate_point(pts, angle, center_pre_rot, center_post_rot)
+    return im, pts
 
 
 ###
