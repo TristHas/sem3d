@@ -22,8 +22,8 @@ def get_keys(ds):
     return list_imgs(os.path.join(original + ds))
 
 def list_imgs(folder):
-    return list(filter(lambda x:x.split(".")[-1] in extensions,
-                       os.listdir(folder)))
+    return list(sorted(filter(lambda x:x.split(".")[-1] in extensions,
+                       os.listdir(folder))))
     
 def imgs_path(ds):
     """
